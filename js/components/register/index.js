@@ -1,11 +1,11 @@
 
 import React, { Component } from 'react';
-import { Image, AsyncStorage } from 'react-native';
+import { Image } from 'react-native';
 import { connect } from 'react-redux';
 import { actions } from 'react-native-navigation-redux-helpers';
 import { Container, Content, Item, Input, Button, Icon, View, Text } from 'native-base';
 
-import { setUser } from '../../actions/user';
+import { setUser, registerUser } from '../../actions/user';
 import styles from './styles';
 
 const {
@@ -14,7 +14,7 @@ const {
 
 const background = require('../../../images/shadow.png');
 
-class Login extends Component {
+class Register extends Component {
 
   static propTypes = {
     setUser: React.PropTypes.func,
@@ -27,20 +27,12 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
       email: '',
-      token: null
+      password: '',
+      rePassword: ''
     };
-  }
 
-  componentWillMount() {
-    AsyncStorage.getItem('token', function (error, result) {
-      if (result) {
-        console.log('TAYLOR: ' + result)
-      } else {
-        console.log('TAYLOR NO RESULT: ' + result)
-      }
-    })
+    this.register = this.register.bind(this);
   }
 
   setUser(name) {
@@ -48,7 +40,12 @@ class Login extends Component {
   }
 
   replaceRoute(route) {
+    this.setUser(this.state.name);
     this.props.replaceAt('login', { key: route }, this.props.navigation.key);
+  }
+
+  register() {
+    this.props.registerUser(this.state)
   }
 
   render() {
@@ -60,23 +57,32 @@ class Login extends Component {
               <View style={styles.bg}>
                 <Item style={styles.input}>
                   <Icon active name="person" />
-                  <Input placeholder="Email" onChangeText={name => this.setState({ name })} />
+                  <Input
+                    placeholder="Email"
+                    onChangeText={email => this.setState({ email })}
+                  />
                 </Item>
                 <Item style={styles.input}>
                   <Icon name="unlock" />
                   <Input
                     placeholder="Password"
+                    onChangeText={password => this.setState({ password })}
                     secureTextEntry
                   />
                 </Item>
-                <Button style={styles.btn} onPress={() => this.replaceRoute('home')}>
-                  <Text>Login</Text>
+                <Item style={styles.input}>
+                  <Icon name="unlock" />
+                  <Input
+                    placeholder="Reenter Password"
+                    onChangeText={rePassword => this.setState({ rePassword })}
+                    secureTextEntry
+                  />
+                </Item>
+                <Button style={styles.btn} onPress={() => {this.register()}}>
+                  <Text>Register</Text>
                 </Button>
               </View>
             </Image>
-            <Button transparent onPress={() => this.replaceRoute('register')}>
-              <Text>Register?</Text>
-            </Button>
           </Content>
         </View>
       </Container>
@@ -88,6 +94,7 @@ function bindActions(dispatch) {
   return {
     replaceAt: (routeKey, route, key) => dispatch(replaceAt(routeKey, route, key)),
     setUser: name => dispatch(setUser(name)),
+    registerUser: user => dispatch(registerUser(user))
   };
 }
 
@@ -95,4 +102,4 @@ const mapStateToProps = state => ({
   navigation: state.cardNavigation,
 });
 
-export default connect(mapStateToProps, bindActions)(Login);
+export default connect(mapStateToProps, bindActions)(Register);

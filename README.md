@@ -46,4 +46,4 @@ $ react-native run-ios
 
 ```sh
 $ react-native run-android
-```
+<!-- ``` -->
